@@ -1,0 +1,50 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "X-Frame-Options", "value": "DENY" },
+      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+      { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+    ]},
+    { "source": "/assets/(.*)", "headers": [ { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" } ] }
+  ],
+  "redirects": [
+    { "source": "/about-riskgg", "destination": "/", "permanent": true },
+    { "source": "/leadership", "destination": "/ai-oversight", "permanent": true },
+    { "source": "/strategy", "destination": "/ai-oversight", "permanent": true },
+    { "source": "/execution", "destination": "/cyber-operational-risk", "permanent": true },
+    { "source": "/our-work", "destination": "/ai-oversight", "permanent": true },
+    { "source": "/work", "destination": "/ai-oversight", "permanent": true },
+    { "source": "/ai-readiness", "destination": "/ai-oversight", "permanent": true },
+    { "source": "/maturity-modeling", "destination": "/ai-oversight", "permanent": true },
+    { "source": "/cyber-risk-management", "destination": "/cyber-operational-risk", "permanent": true },
+    { "source": "/enterprise-security-risk-management", "destination": "/cyber-operational-risk", "permanent": true },
+    { "source": "/operational-resilience", "destination": "/cyber-operational-risk", "permanent": true },
+    { "source": "/ceo-brian-allen", "destination": "/team", "permanent": true },
+    { "source": "/ankur-singhal", "destination": "/team", "permanent": true },
+    { "source": "/privacy-policy", "destination": "/privacy", "permanent": true },
+    { "source": "/terms-of-service", "destination": "/terms", "permanent": true },
+    { "source": "/articles/introducing-enterprise-security-risk-management-esrm", "destination": "/articles/introducing-esrm", "permanent": true },
+    { "source": "/articles/esrm-and-ermclarifying-the-differences", "destination": "/articles/esrm-and-erm", "permanent": true },
+    { "source": "/articles/bpi-navigating-ai-in-banking", "destination": "https://bpi.com/navigating-artificial-intelligence-in-banking/", "permanent": true },
+    { "source": "/articles/building-a-cyber-risk-management-program-evolving-security-for-the-digital-age", "destination": "https://www.oreilly.com/library/view/-/9781098147785/", "permanent": true },
+    { "source": "/articles/enterprise-security-risk-management-concepts-and-applications", "destination": "https://www.asisonline.org/publications/enterprise-security-risk-management/", "permanent": true },
+    { "source": "/articles/crmp-article-on-cso-online", "destination": "https://www.csoonline.com/article/1284801/new-risk-management-framework-helps-with-sec-mandate-compliance.html", "permanent": true },
+    { "source": "/articles/new-risk-management-framework-helps-with-sec-mandate-compliance", "destination": "https://www.csoonline.com/article/1284801/new-risk-management-framework-helps-with-sec-mandate-compliance.html", "permanent": true },
+    { "source": "/articles/practitioners-guide-to-explainability", "destination": "/assets/pdf/AI-Governance-For-Wealth-Management-Executives.pdf", "permanent": true },
+    { "source": "/articles/the-cornerstone-of-communal-responsibility", "destination": "/assets/pdf/BPI-Practitioners-Guide-to-Explainability.pdf", "permanent": true },
+    { "source": "/articles/a-professional-path", "destination": "/assets/pdf/A-Professional-Path-Security-Management-2017.pdf", "permanent": true },
+    { "source": "/articles/harvard-ai-governance-response", "destination": "/perspectives", "permanent": true },
+    { "source": "/wp-content/uploads/2025/05/A-Professional-Path-Security-Management-September-Article-2017-1-1.pdf", "destination": "/assets/pdf/A-Professional-Path-Security-Management-2017.pdf", "permanent": true },
+    { "source": "/wp-content/uploads/2026/01/AI-Governance-For-Wealth-Management-Executives.pdf", "destination": "/assets/pdf/AI-Governance-For-Wealth-Management-Executives.pdf", "permanent": true },
+    { "source": "/wp-content/uploads/2026/01/BPI-Practitioners-Guide-to-Explainability_Navigating-Artificial-Intelligence-in-the-Financial-Sector.pdf", "destination": "/assets/pdf/BPI-Practitioners-Guide-to-Explainability.pdf", "permanent": true },
+    { "source": "/articles/:slug*", "destination": "/perspectives", "permanent": false },
+    { "source": "/wp-content/:path*", "destination": "/perspectives", "permanent": false },
+    { "source": "/wp-admin/:path*", "destination": "/", "permanent": false },
+    { "source": "/feed", "destination": "/perspectives", "permanent": false },
+    { "source": "/category/:path*", "destination": "/perspectives", "permanent": false },
+    { "source": "/tag/:path*", "destination": "/perspectives", "permanent": false }
+  ]
+}

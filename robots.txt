@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://riskgg.com/sitemap.xml
