@@ -44,9 +44,13 @@ def header(active):
     return f'''<header class="site-header">
   <div class="wrap header-inner">
     {wordmark()}
+    <nav class="nav nav-desktop" aria-label="Primary">
+      {links}
+      <a href="contact.html" class="btn btn-solid btn-nav">Talk to us</a>
+    </nav>
     <details class="menu">
       <summary aria-label="Menu">Menu</summary>
-      <nav class="nav" aria-label="Primary">
+      <nav class="nav nav-mobile" aria-label="Mobile Primary">
         {links}
         <a href="contact.html" class="btn btn-solid btn-nav">Talk to us</a>
       </nav>
