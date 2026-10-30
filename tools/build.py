@@ -556,8 +556,6 @@ ARTICLES = [
     ("Guide", "AI Governance for Wealth Management Executives: A Practitioner's Guide to Explainability", PDF + "AI-Governance-For-Wealth-Management-Executives.pdf", "What explainability requires of firms, including smaller and privately held entities, as AI reshapes wealth management. PDF."),
     ("CSO Online", "New risk management framework helps with SEC mandate compliance", "https://www.csoonline.com/article/1284801/new-risk-management-framework-helps-with-sec-mandate-compliance.html", "The authors of the Cyber Risk Management Program framework on meeting SEC and other disclosure and reporting rules."),
     ("Security Management", "A Professional Path", PDF + "A-Professional-Path-Security-Management-2017.pdf", "Enterprise security risk management raises security from a task-bound trade to a business driver in the C-suite. PDF, September 2017."),
-    ("Article", "ESRM and ERM: Clarifying the Differences", "articles/esrm-and-erm.html", "Why ESRM versus ERM is the wrong frame, and how the two fit together."),
-    ("Article", "Introducing Enterprise Security Risk Management (ESRM)", "articles/introducing-esrm.html", "What a security career of decades taught about the difference between managing tasks and managing risk."),
 ]
 
 
@@ -762,8 +760,6 @@ PAGES = [
     ("contact.html", "Talk to Us | Risk Governance Group", "A first conversation is 30 minutes with a senior member of our team. Email info@riskgg.com or call 203-442-4114.", CONTACT, None),
     ("privacy.html", "Privacy Policy | Risk Governance Group", "How Risk Governance Group collects, uses, and protects personal information.", PRIVACY, None),
     ("terms.html", "Terms of Use | Risk Governance Group", "Terms of use for the Risk Governance Group website.", TERMS, None),
-    ("articles/introducing-esrm.html", "Introducing Enterprise Security Risk Management | Risk Governance Group", "ESRM is the practice of managing a security program through the use of risk principles. Brian J. Allen introduces the discipline.", article_page("introducing-esrm", "Introducing Enterprise Security Risk Management (ESRM)", "First published May 2017; republished May 7, 2025", ESRM_INTRO, "Lightly edited from the original for this site. The book referred to was published by Rothstein Publishing in November 2017."), "perspectives.html"),
-    ("articles/esrm-and-erm.html", "ESRM and ERM: Clarifying the Differences | Risk Governance Group", "ESRM and ERM are cousins, not twins. Brian J. Allen on where the two disciplines differ and why an enterprise needs both.", article_page("esrm-and-erm", "ESRM and ERM: Clarifying the Differences", "Republished January 1, 2026", ESRM_ERM, "Lightly edited from the original for this site."), "perspectives.html"),
 ]
 
 def clean_links(doc):
@@ -784,8 +780,6 @@ def relativize(doc, depth):
 def build():
     if os.path.exists(PREVIEW): shutil.rmtree(PREVIEW)
     os.makedirs(os.path.join(PREVIEW, "assets"), exist_ok=True)
-    os.makedirs(os.path.join(PREVIEW, "articles"), exist_ok=True)
-    os.makedirs(os.path.join(SITE, "articles"), exist_ok=True)
     shutil.copy(os.path.join(ROOT, "styles.css"), PREVIEW)
     for f in os.listdir(os.path.join(ROOT, "assets")):
         src = os.path.join(ROOT, "assets", f)
