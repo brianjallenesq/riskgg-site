@@ -16,6 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="theme-color" content="#11144B">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "ProfessionalService", "name": "Risk Governance Group", "legalName": "Risk Governance Group, LLC", "url": "https://riskgg.com/", "email": "info@riskgg.com", "telephone": "+1-203-442-4114", "address": {"@type": "PostalAddress", "addressRegion": "CT", "addressCountry": "US"}, "areaServed": "US", "description": "Risk Governance Group helps boards and executives build and mature AI oversight and risk governance programs they can defend.", "founder": {"@type": "Person", "name": "Brian J. Allen", "jobTitle": "Chief Executive Officer", "url": "https://riskgg.com/team", "sameAs": ["https://www.linkedin.com/in/brian-allen-esq-93a1545/"]}}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -44,7 +47,7 @@
       <div class="btn-row"><a href="#how-we-work" class="btn btn-solid">How we work</a><a href="https://calendar.app.google/1QkTQTcaoQQRDGSk6" rel="noopener" class="btn btn-outline">Book 30 minutes</a></div>
     </div>
     <aside class="hero-aside">
-      <h3>Who we work with</h3>
+      <p class="aside-title">Who we work with</p>
       <span>Boards, audit and risk committees</span>
       <span>CEOs and general counsel</span>
       <span>Chief risk and chief audit executives</span>
@@ -52,36 +55,38 @@
       <span>Companies that sell AI into regulated markets</span>
     </aside>
   </div>
-  <div class="wrap"><figure class="layers">
-<svg viewBox="0 0 560 400" role="img" aria-labelledby="layers-title layers-desc" xmlns="http://www.w3.org/2000/svg">
-  <title id="layers-title">The three layers of AI governance</title>
-  <desc id="layers-desc">Oversight governance sits above management, which sits above technical controls. We start at the top.</desc>
-  <defs>
-    <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1663B3"/></marker>
-  </defs>
-  <rect x="0" y="0" width="560" height="400" fill="#FFFFFF"/>
-  <!-- oversight -->
-  <rect x="36" y="34" width="488" height="104" rx="3" fill="#11144B"/>
-  <rect x="36" y="34" width="6" height="104" fill="#248FEF"/>
-  <text x="62" y="60" font-family="Archivo, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" fill="#8FC2F7">OVERSIGHT GOVERNANCE</text>
-  <text x="62" y="88" font-family="Archivo, Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">What is governed. Who is accountable.</text>
-  <text x="62" y="116" font-family="Archivo, Arial, sans-serif" font-size="14" fill="#D9E2F2">Charter, named accountability, tolerance, authority to operate, the record.</text>
-  <text x="508" y="60" text-anchor="end" font-family="Archivo, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" fill="#248FEF">WHERE WE START</text>
-  <!-- management -->
-  <rect x="36" y="154" width="488" height="96" rx="3" fill="#EEF3FA" stroke="#D5DCE8"/>
-  <text x="62" y="180" font-family="Archivo, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" fill="#1663B3">MANAGEMENT</text>
-  <text x="62" y="207" font-family="Archivo, Arial, sans-serif" font-size="18" font-weight="700" fill="#11144B">The activity, not the rank.</text>
-  <text x="62" y="232" font-family="Archivo, Arial, sans-serif" font-size="14" fill="#3D4257">Objectives, policy, risk assessment and treatment, vendors, training, response.</text>
-  <!-- technical -->
-  <rect x="36" y="266" width="488" height="96" rx="3" fill="#FFFFFF" stroke="#D5DCE8"/>
-  <text x="62" y="292" font-family="Archivo, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" fill="#1663B3">TECHNICAL CONTROLS</text>
-  <text x="62" y="319" font-family="Archivo, Arial, sans-serif" font-size="18" font-weight="700" fill="#11144B">What the system does.</text>
-  <text x="62" y="344" font-family="Archivo, Arial, sans-serif" font-size="14" fill="#3D4257">Security, data, model validation, guardrails, access, logging, fail safe logic.</text>
-  <!-- cascade arrow -->
-  <line x1="542" y1="150" x2="542" y2="356" stroke="#1663B3" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="552" y="258" transform="rotate(90 552 258)" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-size="10" letter-spacing="1.4" fill="#1663B3">DIRECTION CASCADES DOWN</text>
-  <text x="36" y="388" font-family="Archivo, Arial, sans-serif" font-size="12" fill="#6B7186">We work at all three layers. Oversight first, because the layers below cannot supply it.</text>
-</svg>
+  <div class="wrap"><figure class="layers" aria-label="The three layers of AI governance">
+  <div class="layers-body">
+    <div class="layers-rail" aria-hidden="true">
+      <span class="layers-rail-text">Direction cascades down</span>
+      <span class="layers-rail-arrow">&#8595;</span>
+    </div>
+    <ol class="layers-list">
+      <li class="layer-card layer-oversight">
+        <div class="layer-top">
+          <span class="layer-label">Oversight governance</span>
+          <span class="layer-start">Where we start</span>
+        </div>
+        <p class="layer-line">What is governed. Who is accountable.</p>
+        <p class="layer-detail">Charter, named accountability, tolerance, authority to operate, the record.</p>
+      </li>
+      <li class="layer-card layer-management">
+        <div class="layer-top">
+          <span class="layer-label">Management</span>
+        </div>
+        <p class="layer-line">The activity, not the rank.</p>
+        <p class="layer-detail">Objectives, policy, risk assessment and treatment, vendors, training, response.</p>
+      </li>
+      <li class="layer-card layer-technical">
+        <div class="layer-top">
+          <span class="layer-label">Technical controls</span>
+        </div>
+        <p class="layer-line">What the system does.</p>
+        <p class="layer-detail">Security, data, model validation, guardrails, access, logging, fail safe logic.</p>
+      </li>
+    </ol>
+  </div>
+  <figcaption class="layers-caption">We work at all three layers. Oversight first, because the layers below cannot supply it.</figcaption>
 </figure></div>
 </section>
 
@@ -98,9 +103,9 @@
     <h2>Three engagements. One program.</h2>
     <p class="measure muted">Every engagement is scoped to one of these, led by Brian Allen, and delivered by senior practitioners assembled for it. Each one states which layer of governance it addresses.</p>
     <div class="steps">
-      <div class="step"><span class="step-n">1</span><h3>Assess</h3><p>We measure where your oversight program stands today against what regulators, case law, and standards now expect of boards and executives. You get a plain statement of what exists, what is missing, and what matters most.</p></div>
-      <div class="step"><span class="step-n">2</span><h3>Build</h3><p>We help you stand up the program: the charter, the accountable roles, the reporting cadence, the risk tolerances, and the escalation paths that turn oversight from a committee into a working system.</p></div>
-      <div class="step"><span class="step-n">3</span><h3>Mature</h3><p>We stay with you as the program grows, so oversight keeps pace with how fast your organization is adopting AI, and your board can show it made informed decisions at every step.</p></div>
+      <div class="step"><span class="step-n">1</span><div class="eng-head"><h3>Assess</h3><span class="layer-tag">Oversight layer</span></div><p>We measure where your oversight program stands today against what regulators, case law, and standards now expect of boards and executives. You get a plain statement of what exists, what is missing, and what matters most.</p></div>
+      <div class="step"><span class="step-n">2</span><div class="eng-head"><h3>Build</h3><span class="layer-tag">Oversight and management layers</span></div><p>We help you stand up the program: the charter, the accountable roles, the reporting cadence, the risk tolerances, and the escalation paths that turn oversight from a committee into a working system.</p></div>
+      <div class="step"><span class="step-n">3</span><div class="eng-head"><h3>Mature</h3><span class="layer-tag">Oversight layer</span></div><p>We stay with you as the program grows, so oversight keeps pace with how fast your organization is adopting AI, and your board can show it made informed decisions at every step.</p></div>
     </div>
     <div class="btn-row"><a href="/ai-oversight" class="btn btn-outline">AI oversight and risk governance</a><a href="/cyber-operational-risk" class="btn btn-outline">Cyber and operational risk programs</a></div>
   </div>
@@ -160,7 +165,7 @@
     </div>
     <div class="cards-3">
       <a href="https://cfaio.org/is-ai-mission-critical" rel="noopener" class="card">
-        <span class="card-kicker">Research paper</span>
+        <span class="card-kicker">Center paper</span>
         <span class="card-title">Is AI Mission Critical?</span>
         <span class="card-text">Which uses of AI create a board oversight duty, and what the board's record should show.</span>
         <span class="card-link">Read at cfaio.org &#8599;</span>
@@ -185,7 +190,7 @@
   <div class="wrap split">
     <h2>Where the discipline came from</h2>
     <div>
-      <p>We built our practice on cyber and operational risk programs for regulated institutions. That work continues. The same approach that made cyber governance defensible is what AI oversight needs now, on a much shorter clock.</p>
+      <p>We built our practice on cyber and operational risk programs for regulated institutions. That work continues. The oversight lessons from cyber carry over to AI: named accountability, a tolerance the board sets, and a reporting line that does not wait for an incident. The cyber operating model, built to protect and slow to approve, does not. AI needs those lessons on a much shorter clock.</p>
       <div class="btn-row"><a href="/cyber-operational-risk" class="btn btn-outline">Cyber and operational risk programs</a></div>
     </div>
   </div>
@@ -206,19 +211,19 @@
       <p>We help boards and executives build and mature AI oversight and risk governance programs they can defend.</p>
     </div>
     <div>
-      <h4>What we do</h4>
+      <h2>What we do</h2>
       <a href="/ai-oversight">AI oversight and risk governance</a>
       <a href="/cyber-operational-risk">Cyber and operational risk programs</a>
     </div>
     <div>
-      <h4>Firm</h4>
+      <h2>Firm</h2>
       <a href="/team">Team</a>
       <a href="/body-of-work">Body of work</a>
       <a href="/perspectives">Perspectives</a>
       <a href="/contact">Contact</a>
     </div>
     <div>
-      <h4>Reach us</h4>
+      <h2>Reach us</h2>
       <a href="mailto:info@riskgg.com">info@riskgg.com</a>
       <a href="tel:+12034424114">203-442-4114</a>
       <a href="https://www.linkedin.com/in/brian-allen-esq-93a1545/" rel="noopener">Brian Allen on LinkedIn</a>

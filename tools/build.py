@@ -5,7 +5,7 @@ Run from the repo root:  python3 tools/build.py
 Writes the HTML pages into the repo root (what Vercel serves) and a .html-linked copy into _preview/.
 styles.css and assets/ are the source of truth at the repo root; the build does not touch them.
 """
-import os, re, shutil, html
+import os, re, shutil, html, json
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)            # repo root = site root (Vercel serves this)
@@ -29,7 +29,35 @@ NAV = [
 
 FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">'
 
-FAVICON = '<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">'
+FAVICON = '<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">\n<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">\n<meta name="theme-color" content="#11144B">'
+
+HOME_DESC = "Risk Governance Group helps boards and executives build and mature AI oversight and risk governance programs they can defend."
+
+HOME_JSON_LD = json.dumps({
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "Risk Governance Group",
+    "legalName": "Risk Governance Group, LLC",
+    "url": "https://riskgg.com/",
+    "email": "info@riskgg.com",
+    "telephone": "+1-203-442-4114",
+    "address": {
+        "@type": "PostalAddress",
+        "addressRegion": "CT",
+        "addressCountry": "US"
+    },
+    "areaServed": "US",
+    "description": HOME_DESC,
+    "founder": {
+        "@type": "Person",
+        "name": "Brian J. Allen",
+        "jobTitle": "Chief Executive Officer",
+        "url": "https://riskgg.com/team",
+        "sameAs": [
+            "https://www.linkedin.com/in/brian-allen-esq-93a1545/"
+        ]
+    }
+})
 
 def wordmark(white=False):
     cls = "wordmark wordmark-white" if white else "wordmark"
@@ -65,19 +93,19 @@ FOOTER = f'''<footer class="site-footer">
       <p>We help boards and executives build and mature AI oversight and risk governance programs they can defend.</p>
     </div>
     <div>
-      <h4>What we do</h4>
+      <h2>What we do</h2>
       <a href="ai-oversight.html">AI oversight and risk governance</a>
       <a href="cyber-operational-risk.html">Cyber and operational risk programs</a>
     </div>
     <div>
-      <h4>Firm</h4>
+      <h2>Firm</h2>
       <a href="team.html">Team</a>
       <a href="body-of-work.html">Body of work</a>
       <a href="perspectives.html">Perspectives</a>
       <a href="contact.html">Contact</a>
     </div>
     <div>
-      <h4>Reach us</h4>
+      <h2>Reach us</h2>
       <a href="mailto:{EMAIL}">{EMAIL}</a>
       <a href="tel:{PHONE_TEL}">{PHONE_DISPLAY}</a>
       <a href="{LINKEDIN}" rel="noopener">Brian Allen on LinkedIn</a>
@@ -89,42 +117,37 @@ FOOTER = f'''<footer class="site-footer">
   </div>
 </footer>'''
 
+def clean_slug(path):
+    if path == "index.html":
+        return ""
+    if path.endswith("/index.html"):
+        return path[:-11]
+    if path.endswith(".html"):
+        return path[:-5]
+    return path
+
 def head(title, description, path):
     t = html.escape(title); d = html.escape(description)
+    slug = clean_slug(path)
+    url = BASE + slug
+    is_404 = (path == "404.html")
+    robots = '\n<meta name="robots" content="noindex">' if is_404 else ""
+    canon = "" if is_404 else f'\n<link rel="canonical" href="{url}">'
+    og_url = "" if is_404 else f'\n<meta property="og:url" content="{url}">'
+    ld_script = f'\n<script type="application/ld+json">{HOME_JSON_LD}</script>' if path == "index.html" else ""
     return f'''<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{t}</title>
-<meta name="description" content="{d}">
-<link rel="canonical" href="{BASE}{path if path != "index.html" else ""}">
+<meta name="description" content="{d}">{robots}{canon}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Risk Governance Group">
 <meta property="og:title" content="{t}">
-<meta property="og:description" content="{d}">
-<meta property="og:url" content="{BASE}{path if path != "index.html" else ""}">
+<meta property="og:description" content="{d}">{og_url}
 <meta property="og:image" content="{BASE}assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 {FONTS}
 <link rel="stylesheet" href="styles.css">
-{FAVICON}'''
-
-def article_page(slug, title, date, body_paras, source_note=""):
-    paras = "".join(f"<p>{p}</p>" for p in body_paras)
-    note = f'<p class="muted small">{source_note}</p>' if source_note else ""
-    return f'''<section class="page-hero page-hero-tight">
-  <div class="wrap">
-    <div class="eyebrow">Perspectives</div>
-    <h1>{title}</h1>
-    <p class="lede">By Brian J. Allen. {date}.</p>
-  </div>
-</section>
-<section class="band article-body">
-  <div class="wrap measure">
-    {paras}
-    {note}
-    <div class="btn-row"><a href="perspectives.html" class="btn btn-outline">All perspectives</a></div>
-  </div>
-</section>
-{cta()}'''
+{FAVICON}{ld_script}'''
 
 def page(path, title, description, body, active=None):
     return f'''<!DOCTYPE html>
@@ -155,36 +178,38 @@ def cta(heading="If your board is asking what it should be asking about AI, star
   </div>
 </section>'''
 
-LAYERS_SVG = '''<figure class="layers">
-<svg viewBox="0 0 560 400" role="img" aria-labelledby="layers-title layers-desc" xmlns="http://www.w3.org/2000/svg">
-  <title id="layers-title">The three layers of AI governance</title>
-  <desc id="layers-desc">Oversight governance sits above management, which sits above technical controls. We start at the top.</desc>
-  <defs>
-    <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1663B3"/></marker>
-  </defs>
-  <rect x="0" y="0" width="560" height="400" fill="#FFFFFF"/>
-  <!-- oversight -->
-  <rect x="36" y="34" width="488" height="104" rx="3" fill="#11144B"/>
-  <rect x="36" y="34" width="6" height="104" fill="#248FEF"/>
-  <text x="62" y="60" font-family="Archivo, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" fill="#8FC2F7">OVERSIGHT GOVERNANCE</text>
-  <text x="62" y="88" font-family="Archivo, Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">What is governed. Who is accountable.</text>
-  <text x="62" y="116" font-family="Archivo, Arial, sans-serif" font-size="14" fill="#D9E2F2">Charter, named accountability, tolerance, authority to operate, the record.</text>
-  <text x="508" y="60" text-anchor="end" font-family="Archivo, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" fill="#248FEF">WHERE WE START</text>
-  <!-- management -->
-  <rect x="36" y="154" width="488" height="96" rx="3" fill="#EEF3FA" stroke="#D5DCE8"/>
-  <text x="62" y="180" font-family="Archivo, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" fill="#1663B3">MANAGEMENT</text>
-  <text x="62" y="207" font-family="Archivo, Arial, sans-serif" font-size="18" font-weight="700" fill="#11144B">The activity, not the rank.</text>
-  <text x="62" y="232" font-family="Archivo, Arial, sans-serif" font-size="14" fill="#3D4257">Objectives, policy, risk assessment and treatment, vendors, training, response.</text>
-  <!-- technical -->
-  <rect x="36" y="266" width="488" height="96" rx="3" fill="#FFFFFF" stroke="#D5DCE8"/>
-  <text x="62" y="292" font-family="Archivo, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" fill="#1663B3">TECHNICAL CONTROLS</text>
-  <text x="62" y="319" font-family="Archivo, Arial, sans-serif" font-size="18" font-weight="700" fill="#11144B">What the system does.</text>
-  <text x="62" y="344" font-family="Archivo, Arial, sans-serif" font-size="14" fill="#3D4257">Security, data, model validation, guardrails, access, logging, fail safe logic.</text>
-  <!-- cascade arrow -->
-  <line x1="542" y1="150" x2="542" y2="356" stroke="#1663B3" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="552" y="258" transform="rotate(90 552 258)" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-size="10" letter-spacing="1.4" fill="#1663B3">DIRECTION CASCADES DOWN</text>
-  <text x="36" y="388" font-family="Archivo, Arial, sans-serif" font-size="12" fill="#6B7186">We work at all three layers. Oversight first, because the layers below cannot supply it.</text>
-</svg>
+LAYERS_HTML = '''<figure class="layers" aria-label="The three layers of AI governance">
+  <div class="layers-body">
+    <div class="layers-rail" aria-hidden="true">
+      <span class="layers-rail-text">Direction cascades down</span>
+      <span class="layers-rail-arrow">&#8595;</span>
+    </div>
+    <ol class="layers-list">
+      <li class="layer-card layer-oversight">
+        <div class="layer-top">
+          <span class="layer-label">Oversight governance</span>
+          <span class="layer-start">Where we start</span>
+        </div>
+        <p class="layer-line">What is governed. Who is accountable.</p>
+        <p class="layer-detail">Charter, named accountability, tolerance, authority to operate, the record.</p>
+      </li>
+      <li class="layer-card layer-management">
+        <div class="layer-top">
+          <span class="layer-label">Management</span>
+        </div>
+        <p class="layer-line">The activity, not the rank.</p>
+        <p class="layer-detail">Objectives, policy, risk assessment and treatment, vendors, training, response.</p>
+      </li>
+      <li class="layer-card layer-technical">
+        <div class="layer-top">
+          <span class="layer-label">Technical controls</span>
+        </div>
+        <p class="layer-line">What the system does.</p>
+        <p class="layer-detail">Security, data, model validation, guardrails, access, logging, fail safe logic.</p>
+      </li>
+    </ol>
+  </div>
+  <figcaption class="layers-caption">We work at all three layers. Oversight first, because the layers below cannot supply it.</figcaption>
 </figure>'''
 
 def card_research():
@@ -200,7 +225,7 @@ def card_research():
     </div>
     <div class="cards-3">
       <a href="https://cfaio.org/is-ai-mission-critical" rel="noopener" class="card">
-        <span class="card-kicker">Research paper</span>
+        <span class="card-kicker">Center paper</span>
         <span class="card-title">Is AI Mission Critical?</span>
         <span class="card-text">Which uses of AI create a board oversight duty, and what the board's record should show.</span>
         <span class="card-link">Read at cfaio.org &#8599;</span>
@@ -231,7 +256,7 @@ INDEX = f'''<section class="hero">
       <div class="btn-row"><a href="#how-we-work" class="btn btn-solid">How we work</a><a href="{BOOKING}" rel="noopener" class="btn btn-outline">Book 30 minutes</a></div>
     </div>
     <aside class="hero-aside">
-      <h3>Who we work with</h3>
+      <p class="aside-title">Who we work with</p>
       <span>Boards, audit and risk committees</span>
       <span>CEOs and general counsel</span>
       <span>Chief risk and chief audit executives</span>
@@ -239,7 +264,7 @@ INDEX = f'''<section class="hero">
       <span>Companies that sell AI into regulated markets</span>
     </aside>
   </div>
-  <div class="wrap">{LAYERS_SVG}</div>
+  <div class="wrap">{LAYERS_HTML}</div>
 </section>
 
 <section class="band">
@@ -255,9 +280,9 @@ INDEX = f'''<section class="hero">
     <h2>Three engagements. One program.</h2>
     <p class="measure muted">Every engagement is scoped to one of these, led by Brian Allen, and delivered by senior practitioners assembled for it. Each one states which layer of governance it addresses.</p>
     <div class="steps">
-      <div class="step"><span class="step-n">1</span><h3>Assess</h3><p>We measure where your oversight program stands today against what regulators, case law, and standards now expect of boards and executives. You get a plain statement of what exists, what is missing, and what matters most.</p></div>
-      <div class="step"><span class="step-n">2</span><h3>Build</h3><p>We help you stand up the program: the charter, the accountable roles, the reporting cadence, the risk tolerances, and the escalation paths that turn oversight from a committee into a working system.</p></div>
-      <div class="step"><span class="step-n">3</span><h3>Mature</h3><p>We stay with you as the program grows, so oversight keeps pace with how fast your organization is adopting AI, and your board can show it made informed decisions at every step.</p></div>
+      <div class="step"><span class="step-n">1</span><div class="eng-head"><h3>Assess</h3><span class="layer-tag">Oversight layer</span></div><p>We measure where your oversight program stands today against what regulators, case law, and standards now expect of boards and executives. You get a plain statement of what exists, what is missing, and what matters most.</p></div>
+      <div class="step"><span class="step-n">2</span><div class="eng-head"><h3>Build</h3><span class="layer-tag">Oversight and management layers</span></div><p>We help you stand up the program: the charter, the accountable roles, the reporting cadence, the risk tolerances, and the escalation paths that turn oversight from a committee into a working system.</p></div>
+      <div class="step"><span class="step-n">3</span><div class="eng-head"><h3>Mature</h3><span class="layer-tag">Oversight layer</span></div><p>We stay with you as the program grows, so oversight keeps pace with how fast your organization is adopting AI, and your board can show it made informed decisions at every step.</p></div>
     </div>
     <div class="btn-row"><a href="ai-oversight.html" class="btn btn-outline">AI oversight and risk governance</a><a href="cyber-operational-risk.html" class="btn btn-outline">Cyber and operational risk programs</a></div>
   </div>
@@ -311,7 +336,7 @@ INDEX = f'''<section class="hero">
   <div class="wrap split">
     <h2>Where the discipline came from</h2>
     <div>
-      <p>We built our practice on cyber and operational risk programs for regulated institutions. That work continues. The same approach that made cyber governance defensible is what AI oversight needs now, on a much shorter clock.</p>
+      <p>We built our practice on cyber and operational risk programs for regulated institutions. That work continues. The oversight lessons from cyber carry over to AI: named accountability, a tolerance the board sets, and a reporting line that does not wait for an incident. The cyber operating model, built to protect and slow to approve, does not. AI needs those lessons on a much shorter clock.</p>
       <div class="btn-row"><a href="cyber-operational-risk.html" class="btn btn-outline">Cyber and operational risk programs</a></div>
     </div>
   </div>
@@ -555,40 +580,9 @@ PDF = "assets/pdf/"
 ARTICLES = [
     ("Book", "Building a Cyber Risk Management Program: Evolving Security for the Digital Age", "https://www.oreilly.com/library/view/-/9781098147785/", "O'Reilly Media, 2023. A detailed framework for designing, developing, and implementing a cyber risk management program."),
     ("Book", "Enterprise Security Risk Management: Concepts and Applications", "https://www.asisonline.org/publications/enterprise-security-risk-management/", "Rothstein Publishing, 2017. Why security and business interests drift apart, and how a risk discipline brings them back together."),
-    ("Bank Policy Institute", "Navigating Artificial Intelligence in Banking", "https://bpi.com/navigating-artificial-intelligence-in-banking/", "How banking organizations deploy new technologies while continuing to operate in a safe and sound manner."),
-    ("Bank Policy Institute", "Navigating Artificial Intelligence in the Financial Sector: A Practitioner's Guide to Explainability", PDF + "BPI-Practitioners-Guide-to-Explainability.pdf", "Generative AI in the financial sector, the explainability question, and the shared responsibility that comes with it. PDF."),
-    ("Guide", "AI Governance for Wealth Management Executives: A Practitioner's Guide to Explainability", PDF + "AI-Governance-For-Wealth-Management-Executives.pdf", "What explainability requires of firms, including smaller and privately held entities, as AI reshapes wealth management. PDF."),
+    ("Bank Policy Institute, 2024", "Navigating Artificial Intelligence in Banking", "https://bpi.com/navigating-artificial-intelligence-in-banking/", "How banking organizations deploy new technologies while continuing to operate in a safe and sound manner. Written while Brian Allen was SVP of Emerging Technology Risk Management at BPI; published under the BPI staff byline."),
     ("CSO Online", "New risk management framework helps with SEC mandate compliance", "https://www.csoonline.com/article/1284801/new-risk-management-framework-helps-with-sec-mandate-compliance.html", "The authors of the Cyber Risk Management Program framework on meeting SEC and other disclosure and reporting rules."),
     ("Security Management", "A Professional Path", PDF + "A-Professional-Path-Security-Management-2017.pdf", "Enterprise security risk management raises security from a task-bound trade to a business driver in the C-suite. PDF, September 2017."),
-]
-
-
-ESRM_INTRO = [
- "In the course of a security career that now stretches back decades, I have spoken with hundreds and hundreds of security practitioners. They were people in very different roles, with very different backgrounds, and at very different stages in their careers: everyone from chief security officers at Fortune 500 companies, to cybersecurity experts, to retired police officers managing physical security at manufacturing plants and warehouses. I have heard them talk about their experiences, their best practices, their satisfactions and their frustrations. I have learned something valuable from my conversations with every single one of those people, and I have distilled those lessons into a comprehensive approach to the theory and practice of security, called Enterprise Security Risk Management (ESRM).",
- "I believe ESRM has the potential to completely change the practice of security. ESRM principles can change the way we do our jobs, the way we see our roles and the way others see them, and the ways we protect our enterprises, their assets, and their employees. And ESRM can help us in our careers, by increasing our personal and professional satisfaction and by ensuring that security is seen, as it deserves to be, as a professional discipline.",
- "I believe so deeply in ESRM that along with my longtime colleague Rachelle Loyear, I wrote a book about it: <em>Enterprise Security Risk Management: Concepts and Applications</em>, published by Rothstein Publishing. It is why I speak about ESRM at industry conferences, offer presentations about it to boards of directors and senior executives, and write about it in industry publications.",
- "<b>So what is ESRM, exactly?</b>",
- "ESRM is the practice of managing a security program through the use of risk principles. It is a philosophy of management that can be applied to any area of security and any task that is performed by security, such as physical security, cybersecurity, information security, business continuity management and investigations.",
- "There is nothing exactly new about any of the specific components that make up that definition. ESRM is based on long established, internationally recognized risk management concepts and principles. But in the real world, those concepts and principles are almost never applied across the entire enterprise, comprehensively, to every aspect of the enterprise that is affected by security, which, as we all know, means every aspect of the enterprise. That is what ESRM is designed to do.",
- "<b>ESRM changes the security function completely, from a set of tasks to a role.</b>",
- "When ESRM principles are applied, the security function changes completely, from a set of tasks performed discretely to a role. It is no longer about checking IDs at entrance gates, or installing antivirus software, or trying to keep employees from stealing from retail stores. That does not mean those functions are not important anymore. But it does mean that when they are performed, they are performed for a reason. ESRM means security decisions are made by the right person, with the right authority and accountability, and for the right reasons: reasons based on defined risk principles.",
- "What does this mean in practice? In its simplest terms, it means that instead of just doing security the way we always have, we first ask ourselves some fundamental, and fundamentally important, questions. Here are a few of the most basic. What is the asset we need to protect? What is the risk associated with that asset? Who is responsible for that risk? How should we mitigate the risk, and how should we respond if the risk becomes a reality?",
- "Once we start asking ourselves, and others, those questions, the discrete security tasks we have been performing begin to make sense as part of a comprehensive security and risk management framework. We are no longer just making sure the gates of the assembly plant are secure. We are working toward an understanding of why they need to be kept secure, what is inside the plant that needs to be protected, who will be affected if our security measures fail, and what additional or different measures we might need to take. In other words, we know why we are doing what we do, and that means we can do it better. A lot better.",
- "Whatever your current role, whatever kind of enterprise you work for, wherever you want your career to take you, there are certain things I am sure you want. You want to be able to do your job to the best of your abilities. You want to be seen as a problem solver, not somebody who keeps other people from doing their jobs. You want to be seen as a partner by your peers in the business. And you want to be taken seriously as a professional, and you want security to be taken seriously as a profession.",
- "ESRM is the key to all of these goals. It is not just the security practitioner who benefits. ESRM offers a path to personal and professional satisfaction to security professionals of all kinds, and it helps your business partners in the enterprise: the plant manager working to keep the supply chain up and running, the HR team trying to make sure the work environment is safe, and the corporate communications professional worrying about the enterprise's reputation in the community.",
- "<b>Who can benefit from ESRM? Everyone.</b>",
- "ESRM can benefit everyone, in every role, in every industry.",
-]
-ESRM_ERM = [
- "I used to write ESRM versus ERM, but as this ESRM conversation continues to mature, I see I was wrong. It is faulty logic to think that there is a binary choice. It is also not accurate to say ESRM and ERM are the same thing and you only need one or the other. They are not the same concept and you do not need to choose one or the other. In every way they are complementary to each other. They share similar concepts. They are built from the same risk principles as any risk program inherently is built. There is still confusion regarding the two, so let us clear up the faulty logic that they are the same.",
- "First, the similarities. ESRM, like ERM, is a risk based practice. There are many risk practices: safety, insurance, financial risk management, and business continuity to name a few. They all use risk principles in their discipline that are then applied to topics, or a scope of responsibility, to be implemented. The risk principles used are fairly static. Risk principles come in various forms and use different terms, but the risk paradigm is static. So, in a way, they are very similar; definitely of the same family, yet more like cousins. Either way, you know what you cannot do. You cannot marry the two.",
- "What makes them different is their focus and implementation. I will start with ERM. ERM, using risk principles, applies the practice to any risk across the enterprise: capitalization, human capital, regulatory, all security risks, and so on. The ERM practitioner will use the risk principles to guide their practice. The risk principles in practice do not describe the scope to be focused on; they are simply the guiding principles the ERM practitioner will work within. The focus on enterprise risks defines the ERM designation.",
- "The difference: ESRM defines the scope of focus on security risks and uses risk principles to define and guide the security practitioner in managing the security scope of risks. Break this into two parts. First, ESRM is narrowly scoped and focused on security risks. It does not matter if you are focused on physical security, cyber, information, terror, or workplace violence. It also does not matter what discipline you are practicing or at what level; a CSO, or a line employee installing cameras or assigning online credentials. It defines scope in broad terms and can be as narrow as needed so long as the scope remains within the realm of security risks.",
- "Second, ESRM defines the security practice through globally accepted risk principles, not unlike ERM. Similar to how the risk principles define the role of the ERM practitioner, the risk principles define the role of the security practitioner. There are many different tasks an ERM practitioner engages in that a security practitioner would not, and vice versa. For example, the actual implementation of any security program or the nuances of a program: conducting an investigation, implementing an identity management system, or assessing a workplace violence threat. It would be silly to compare the two by task, so we are not going there. Clearly the role of an ERM practitioner and a security practitioner is different. You can see, though, that a large part of ESRM is about how any security practitioner would be guided through their practice using risk principles.",
- "As a recap: ERM defines the scope and how to practice. ESRM defines the scope and how to practice. The scope and practice in each are different in many ways. The differences make them, well, different. They are absolutely complementary to each other. Enterprises need both.",
- "I had a point of clarity around the similarities and differences of ESRM and ERM in my experience as a CSO that I found very satisfying. I was working with our ERM lead and we were working through all the main risks and risk owners: legal, finance, technology, security, operations, and the rest. He kept trying to find a placeholder for us to own the security risks, because of course we managed security risks, amongst other risks, all over the enterprise. At the point of this discussion, our security group was thoroughly practicing ESRM and it was clear we did not own any of the risks. Yet it seemed to the ERM group that we needed to own something, like security risks, because we were managing the entire security program: all the physical security, cybersecurity governance risks, business continuity, investigations, fraud management, and more. Our role was not to own the risks. We were, however, managing the security risks, using ESRM principles that defined our scope and discipline. The asset owners and business owners owned the risks.",
- "At the end of the day, the ERM group and our security group had distinctly different roles, and along the way they learned what our role actually was. It was to manage the asset owners and business owners through their security risks, being the subject matter experts along the way. We practiced our disciplines in many of the same ways, but we were very different in our scope and actual day to day practice. I would say we were cousins.",
- "Applying risk management to security is certainly not new or novel; in fact, it is kind of old hat to think it is new. We have just been stuck in a rut. Some of that rut is not finding distinctions between ESRM and ERM. I make no excuses. I used to write ESRM versus ERM. I was wrong. Happily, this conversation has matured and we are making needed progress developing our security discipline. It is going to be necessary that we continually challenge our thoughts on how we have perceived ourselves and our role in the past. One final thought worth repeating: ESRM and ERM are similar in name, and of the same family, but there are significant differences. So, let us keep some separation between the two.",
 ]
 
 def article_rows():
@@ -614,7 +608,7 @@ PERSPECTIVES = f'''<section class="page-hero">
       </div>
       <p class="muted">Research by Brian Allen published through the Center, an independent 501(c)(3). These links open on the Center's site.</p>
       <div class="list-rows">
-        <a href="https://cfaio.org/is-ai-mission-critical" rel="noopener" class="article"><span class="art-cat">Research paper</span><span class="art-body"><span class="art-title">Is AI Mission Critical?</span><span class="art-blurb">Which uses of AI create a board oversight duty, and what the board's record should show.</span></span><span class="art-arrow">&#8599;</span></a>
+        <a href="https://cfaio.org/is-ai-mission-critical" rel="noopener" class="article"><span class="art-cat">Center paper</span><span class="art-body"><span class="art-title">Is AI Mission Critical?</span><span class="art-blurb">Which uses of AI create a board oversight duty, and what the board's record should show.</span></span><span class="art-arrow">&#8599;</span></a>
         <a href="https://cfaio.org/the-ai-oversight-governance-layer" rel="noopener" class="article"><span class="art-cat">Center paper</span><span class="art-body"><span class="art-title">The AI Oversight Governance Layer</span><span class="art-blurb">The decisions that establish what an enterprise governs, who answers, and what record the program must produce.</span></span><span class="art-arrow">&#8599;</span></a>
         <a href="https://cfaio.org/committee-fallacy-anatomy" rel="noopener" class="article"><span class="art-cat">Center paper</span><span class="art-body"><span class="art-title">The Committee Fallacy</span><span class="art-blurb">Assigning AI risk to a committee is not governing it.</span></span><span class="art-arrow">&#8599;</span></a>
         <a href="https://cfaio.org/builders-and-buyers" rel="noopener" class="article"><span class="art-cat">Center paper</span><span class="art-body"><span class="art-title">Builders and Buyers</span><span class="art-blurb">Decision rights and accountability for institutions that build AI and those that put it to work.</span></span><span class="art-arrow">&#8599;</span></a>
@@ -679,9 +673,8 @@ PRIVACY = f'''<section class="page-hero page-hero-tight">
       <li><b>Professional information:</b> your company or business name, job title, business address.</li>
     </ul>
     <p>We collect this information when you email us, call us, or request information about our services.</p>
-    <p>We also collect certain information automatically when you visit the Site, such as your IP address and usage data, through tools like Google Analytics (see section 3).</p>
     <h2>3. Cookies and analytics</h2>
-    <p>The Site may use cookies and similar technologies to understand how visitors use it. Google Analytics collects usage data on our behalf and is subject to Google's own privacy terms. You can control cookies through your browser settings. Disabling cookies does not affect your ability to read the Site.</p>
+    <p>The Site does not use analytics, advertising or tracking cookies. Our hosting provider processes technical information such as IP addresses and request logs to deliver the Site and protect it from misuse. If we add analytics in the future, we will update this section before we do.</p>
     <h2>4. How we use your information</h2>
     <p>We use the personal information we collect for the following purposes:</p>
     <ul>
@@ -689,14 +682,13 @@ PRIVACY = f'''<section class="page-hero page-hero-tight">
       <li>To send you communications and other information you have requested or consented to receive.</li>
       <li>To provide you with information about our services.</li>
       <li>To operate, maintain, and improve the Site and our services.</li>
-      <li>To understand how visitors use the Site using analytics.</li>
       <li>To comply with legal obligations and protect our legal rights.</li>
     </ul>
     <h2>5. Sharing your information</h2>
     <p>We do not sell your personal information. We do not share your personal information with third parties for their own marketing purposes.</p>
     <p>We may share information in the following circumstances:</p>
     <ul>
-      <li><b>Service providers:</b> we use third-party service providers to perform functions on our behalf, such as website hosting and analytics. These providers only have access to the information needed to perform their functions and are obligated to maintain confidentiality and security.</li>
+      <li><b>Service providers:</b> we use third-party service providers to perform functions on our behalf, such as website hosting. These providers only have access to the information needed to perform their functions and are obligated to maintain confidentiality and security.</li>
       <li><b>Legal requirements:</b> we may disclose your information if required by law, subpoena, or other legal process, or if we believe in good faith that disclosure is necessary to protect our rights, protect your safety or the safety of others, investigate fraud, or respond to a government request.</li>
       <li><b>Business transfers:</b> in the event of a merger, acquisition, reorganization, bankruptcy, or other similar event, your personal information may be transferred as part of the transaction, subject to standard confidentiality arrangements.</li>
     </ul>
@@ -754,16 +746,31 @@ TERMS = f'''<section class="page-hero page-hero-tight">
   </div>
 </section>'''
 
+NOT_FOUND = f'''<section class="page-hero page-hero-tight">
+  <div class="wrap">
+    <h1>Page not found</h1>
+    <p class="lede">The page you are looking for has moved or no longer exists.</p>
+    <div class="btn-row">
+      <a href="index.html" class="btn btn-solid">Home</a>
+      <a href="ai-oversight.html" class="btn btn-outline">AI oversight and risk governance</a>
+      <a href="contact.html" class="btn btn-outline">Talk to us</a>
+    </div>
+  </div>
+</section>
+
+{cta()}'''
+
 PAGES = [
-    ("index.html", "Risk Governance Group", "Risk Governance Group helps boards and executives build and mature AI oversight and risk governance programs they can defend.", INDEX, None),
+    ("index.html", "Risk Governance Group", HOME_DESC, INDEX, None),
     ("ai-oversight.html", "AI Oversight and Risk Governance | Risk Governance Group", "Oversight assessment, program build, and annual re-assessment for boards and executives accountable for AI.", AI_OVERSIGHT, "ai-oversight.html"),
     ("cyber-operational-risk.html", "Cyber and Operational Risk Programs | Risk Governance Group", "Cyber risk management programs, enterprise security risk management, operational resilience, and board reporting on technology risk.", CYBER, "cyber-operational-risk.html"),
     ("team.html", "Team | Risk Governance Group", "Every engagement is led by Brian Allen and delivered by senior practitioners assembled for it. We name the team in every proposal.", TEAM, "team.html"),
     ("body-of-work.html", "Body of Work | Risk Governance Group", "Books, public work, and research by Brian Allen on cyber risk, enterprise security risk management, and AI oversight.", BODY_OF_WORK, "body-of-work.html"),
-    ("perspectives.html", "Perspectives | Risk Governance Group", "Articles and papers on AI governance, cyber risk, and security risk management.", PERSPECTIVES, "perspectives.html"),
-    ("contact.html", "Talk to Us | Risk Governance Group", "A first conversation is 30 minutes with a senior member of our team. Email info@riskgg.com or call 203-442-4114.", CONTACT, None),
-    ("privacy.html", "Privacy Policy | Risk Governance Group", "How Risk Governance Group collects, uses, and protects personal information.", PRIVACY, None),
-    ("terms.html", "Terms of Use | Risk Governance Group", "Terms of use for the Risk Governance Group website.", TERMS, None),
+    ("perspectives.html", "Perspectives | Risk Governance Group", "Articles, papers, and books by Brian Allen on AI oversight, cyber risk management, and enterprise security risk management.", PERSPECTIVES, "perspectives.html"),
+    ("contact.html", "Talk to us | Risk Governance Group", "A first conversation is 30 minutes with a senior member of our team. Email info@riskgg.com or call 203-442-4114.", CONTACT, None),
+    ("privacy.html", "Privacy Policy | Risk Governance Group", "How Risk Governance Group collects, uses, shares, and protects personal information, and the choices and rights you have.", PRIVACY, None),
+    ("terms.html", "Terms of Use | Risk Governance Group", "Terms of use for the Risk Governance Group website, covering permitted use, intellectual property, disclaimers, liability, and governing law.", TERMS, None),
+    ("404.html", "Page not found | Risk Governance Group", "The page you are looking for has moved or no longer exists.", NOT_FOUND, None),
 ]
 
 def clean_links(doc):
@@ -793,15 +800,15 @@ def build():
         doc = page(path, title, desc, body, active)
         depth = path.count("/")
         # repo copy: clean URLs, root-relative assets
-        with open(os.path.join(SITE, path), "w") as fh: fh.write(clean_links(doc))
-        urls.append(BASE + (path[:-5] if path != "index.html" else "").replace("index", ""))
+        with open(os.path.join(SITE, path), "w", encoding="utf-8") as fh: fh.write(clean_links(doc))
+        if path != "404.html":
+            urls.append(BASE + clean_slug(path))
         # preview copy: plain .html links
         pdoc = relativize(doc, depth)
         if path == "index.html":
             inner = pdoc.split("<body>",1)[1].rsplit("</body>",1)[0]
-            pdoc = (f'<title>{html.escape(title)}</title>\n<meta name="description" content="{html.escape(desc)}">\n{FONTS}\n<link rel="stylesheet" href="styles.css">\n{FAVICON}\n'
-                    '<style>html,body{background:#FFFFFF}</style>\n') + inner
-        with open(os.path.join(PREVIEW, path), "w") as fh: fh.write(pdoc)
+            pdoc = f'<title>{html.escape(title)}</title>\n<meta name="description" content="{html.escape(desc)}">\n{FONTS}\n<link rel="stylesheet" href="styles.css">\n{FAVICON}\n' + inner
+        with open(os.path.join(PREVIEW, path), "w", encoding="utf-8") as fh: fh.write(pdoc)
     # sitemap and robots
     today = __import__("datetime").date.today().isoformat()
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -809,8 +816,8 @@ def build():
         u = u if u.endswith("/") or u != BASE.rstrip("/") else u + "/"
         sm += f"  <url><loc>{u}</loc><lastmod>{today}</lastmod></url>\n"
     sm += "</urlset>\n"
-    with open(os.path.join(SITE, "sitemap.xml"), "w") as fh: fh.write(sm)
-    with open(os.path.join(SITE, "robots.txt"), "w") as fh: fh.write(f"User-agent: *\nAllow: /\nSitemap: {BASE}sitemap.xml\n")
+    with open(os.path.join(SITE, "sitemap.xml"), "w", encoding="utf-8") as fh: fh.write(sm)
+    with open(os.path.join(SITE, "robots.txt"), "w", encoding="utf-8") as fh: fh.write(f"User-agent: *\nAllow: /\nSitemap: {BASE}sitemap.xml\n")
     print("built", len(PAGES), "pages into", SITE, "and preview into", PREVIEW)
 
 if __name__ == "__main__":
